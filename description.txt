@@ -1,0 +1,13 @@
+Short description for our project:
+1. We have 3 types of cells : Crocodile, Monkey and Chicken.
+2. We added some rules for them: 
+	a) If Chicken is near with Crocodile, then Crocodile will eat it and wiil go to it's position.
+	b) If a Monkey is between 4 Chickens, they will peck it and Monkey will dissapear.
+	c) If a Crocodile is between 4 Monkey, they will peck it and Crocodile will dissapear.
+3. We added some environments:
+	a) Lava - is an environment that kills all type of cells that are instantiating on it.
+	b) Banana - is an environment that gives opportunity for cells of type Monkey to appear on it.
+	c) Fertile - is an environment where the reproduction is working faster.
+	d) And we are checking to not overlapp our randomly generated environments.
+4. Every object that appears in our game is instantiated randomly.
+5. We added an option to increase or decrease the generatiion interval by pressing Up Arrow or Down Arrow key and also you can see total number of each type of animal.

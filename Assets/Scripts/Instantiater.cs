@@ -5,23 +5,25 @@ using UnityEngine;
 
 public class Instantiater : MonoBehaviour
 {	
-	// public GameObject cellTemplate;
-	// public GameObject templateCrocodile;
-	// public GameObject templateMonkey;
-	// public GameObject templateChicken;
-	float generationInterval = 1F;
+	public static float generationInterval = 1F;
     
 	int[ , ] monkeyArray;
 	int[ , ] chickenArray;
 	int[ , ] crocodileArray;
 	int[ , ] lavaArray;
+	int[ , ] bananaArray;
+	int[ , ] fertileArray;
 
 	public int gridHeight;
 	private int gridWidth;
 
 	private float cellSize;
 	private float lavaSize;
+	private float bananaSize;
+	private float fertileSize;
 
+	public Fertile fertile;
+	public Banana banana;
 	public Lava lava;
 	public Chicken chicken;
 	public Monkey monkey;
@@ -32,72 +34,23 @@ public class Instantiater : MonoBehaviour
     {
     	gridWidth = Mathf.RoundToInt(gridHeight * Camera.main.aspect);
 
-    	// cellsArray = new int[gridHeight, gridWidth];
     	cellSize = (Camera.main.orthographicSize * 2) / gridHeight;
     	lavaSize = (Camera.main.orthographicSize * 2) / gridHeight;
+    	bananaSize = (Camera.main.orthographicSize * 2) / gridHeight;
+    	fertileSize = (Camera.main.orthographicSize * 2) / gridHeight;
+
     	monkeyArray = new int[gridHeight, gridWidth];
     	chickenArray = new int[gridHeight, gridWidth];
     	crocodileArray = new int[gridHeight, gridWidth];
     	lavaArray = new int[gridHeight, gridWidth];
+    	bananaArray = new int[gridHeight, gridWidth];
+    	fertileArray = new int[gridHeight, gridWidth];
     	
-
-
-    	// print("Dimensions: " + gridWidth + "X" + gridHeight);
-    	// print("Cell size: " + cellSize);
-
-    	// for (int i = 0; i < 1500; i++)
-    	// {
-    	// 	cellsArray[Random.Range(20, 70), Random.Range(30, 120)] = 1;
-    	// }
-
-    	// for (int i = 0; i < 5; i++)
-    	// {
-    	// 	cellsArray[Random.Range(20, 70), Random.Range(30, 120)] = 1;
-    	// }
+    	GenerateFertile();
+    	GenerateBanana();
     	GenerateLava();
         InvokeRepeating("NewGenerationUpdate", generationInterval, generationInterval);
     }
-
-    // private void Awake()
-    // {
-    // 	chicken = Resources.Load<Chicken>("Chicken");
-    // 	monkey = Resources.Load<Monkey>("Monkey");
-    // 	crocodile = Resources.Load<Crocodile>("Crocodile");
-    // }
-    
-    // void Update()
-    // {
-    //     if (Input.GetMouseButtonDown(0))
-    //     {
-    //     	Vector3 clickPositionInScreenCoords = Input.mousePosition;
-    //     	clickPositionInScreenCoords.z = -Camera.main.transform.position.z;
-    //     	Vector3 clickPositionInWorldCoords = Camera.main.ScreenToWorldPoint(clickPositionInScreenCoords);
-    //     	clickPositionInWorldCoords.z = 0;
-
-        	 
-    //     	Chicken newChicken = Instantiate (chicken, clickPositionInWorldCoords, Quaternion.identity) as Chicken;
-    //     }
-
-    //     if (Input.GetMouseButtonDown(1))
-    //     {
-    //     	Vector3 clickPositionInScreenCoords = Input.mousePosition;
-    //     	clickPositionInScreenCoords.z = -Camera.main.transform.position.z;
-    //     	Vector3 clickPositionInWorldCoords = Camera.main.ScreenToWorldPoint(clickPositionInScreenCoords);
-    //     	clickPositionInWorldCoords.z = 0;
-
-    //     	Monkey newMonkey = Instantiate (monkey, clickPositionInWorldCoords, Quaternion.identity) as Monkey;
-    //     }
-
-    //     if (Input.GetMouseButtonDown(2))
-    //     {
-    //     	Vector3 clickPositionInScreenCoords = Input.mousePosition;
-    //     	clickPositionInScreenCoords.z = -Camera.main.transform.position.z;
-    //     	Vector3 clickPositionInWorldCoords = Camera.main.ScreenToWorldPoint(clickPositionInScreenCoords);
-    //     	clickPositionInWorldCoords.z = 0;
-
-    //     	Crocodile newCrocodile = Instantiate (crocodile, clickPositionInWorldCoords, Quaternion.identity) as Crocodile;
-    //     }
-    // }
 
     private void NewGenerationUpdate()
     {
@@ -106,34 +59,98 @@ public class Instantiater : MonoBehaviour
     	GenerateCells(chicken, ref chickenArray, "Chicken");
     	GenerateCells(crocodile, ref crocodileArray, "Crocodile");
     }
+    
+	private bool CheckOverlapping(int[,] arr, int row, int col) {
+	    int start, start1, final, final1;
 
-    private void GenerateCells<T>(T animal, ref int[ , ] arr, string tag) where T: Unit
+	    if (row - 20 < 0)
+	        start = 0;
+	    else
+	        start = row - 20;
+	    if (row + 20 >= gridHeight)
+	        final = gridHeight - 1;
+	    else
+	        final = row + 20;
+
+
+	    if (col - 20 < 0)
+	        start1 = 0;
+	    else
+	        start1 = col - 20;
+	    if (col + 20 >= gridWidth)
+	        final1 = gridWidth - 1;
+	    else
+	        final1 = col + 20;
+
+
+	    for(int i = start; i <= final; i++)
+	        for (int j = start1; j <= final1; j++)
+	            if(arr[i,j] == 1)
+	                return false;
+
+
+	    return true;
+	}
+    
+    private void GenerateFertile()
     {
-    	foreach (GameObject cell in GameObject.FindGameObjectsWithTag(tag))
+    	foreach (GameObject cell in GameObject.FindGameObjectsWithTag("Fertile"))
     	{
     		Destroy(cell);
     	}
-    	//arr = new int[gridHeight, gridWidth];
     	for (int i = 0; i < 3; i++)
     	{
-    		arr[Random.Range(20, 70), Random.Range(30, 120)] = 1;
+    		fertileArray[Random.Range(20, 70), Random.Range(30, 120)] = 1;
     	}
 
     	for (int i = 0; i < gridHeight; i++)
     	{
     		for (int j = 0; j < gridWidth; j++ )
     		{
-    			if (arr[i, j] == 0) continue;
-    			Vector3 cellPosition = new Vector3(
-    				j * cellSize + cellSize/2,
-    				(cellSize * gridHeight) - (i * cellSize + cellSize/2),
+    			if (fertileArray[i, j] == 0) continue;
+    			Vector3 fertilePosition = new Vector3(
+    				j * fertileSize + fertileSize/2,
+    				(fertileSize * gridHeight) - (i * fertileSize + fertileSize/2),
     				0
     			);
 
-    			T clone = Instantiate(animal, cellPosition, Quaternion.identity) as T;
-    			// Monkey clone1 = Instantiate(monkey, cellPosition, Quaternion.identity) as Monkey;
-    			// Crocodile clone2 = Instantiate(crocodile, cellPosition, Quaternion.identity) as Crocodile;
-    			
+    			Fertile clone3 = Instantiate(fertile, fertilePosition, Quaternion.identity) as Fertile;
+    		}
+    	}
+    }
+
+    private void GenerateBanana()
+    {
+    	foreach (GameObject cell in GameObject.FindGameObjectsWithTag("Banana"))
+    	{
+    		Destroy(cell);
+    	}
+
+    	int count = 0;
+    	while (count != 3)
+    	{
+    		int row = Random.Range(20, 70);
+    		int col = Random.Range(30, 120);
+
+    		if (!CheckOverlapping(fertileArray, row, col) || !CheckOverlapping(lavaArray, row, col))
+    		{
+    			bananaArray[row, col] = 1;
+    			count++;
+    		}
+    	}
+
+    	for (int i = 0; i < gridHeight; i++)
+    	{
+    		for (int j = 0; j < gridWidth; j++ )
+    		{
+    			if (bananaArray[i, j] == 0) continue;
+    			Vector3 bananaPosition = new Vector3(
+    				j * bananaSize + bananaSize/2,
+    				(bananaSize * gridHeight) - (i * bananaSize + bananaSize/2),
+    				0
+    			);
+
+    			Banana clone2 = Instantiate(banana, bananaPosition, Quaternion.identity) as Banana;
     		}
     	}
     }
@@ -144,9 +161,18 @@ public class Instantiater : MonoBehaviour
     	{
     		Destroy(cell);
     	}
-    	for (int i = 0; i < 3; i++)
+
+    	int count = 0;
+    	while (count != 5)
     	{
-    		lavaArray[Random.Range(20, 70), Random.Range(30, 120)] = 1;
+    		int row = Random.Range(20, 70);
+    		int col = Random.Range(30, 120);
+
+    		if (!CheckOverlapping(bananaArray, row, col) || !CheckOverlapping(fertileArray, row, col))
+    		{
+    			lavaArray[row, col] = 1;
+    			count++;
+    		}
     	}
 
     	for (int i = 0; i < gridHeight; i++)
@@ -165,9 +191,37 @@ public class Instantiater : MonoBehaviour
     	}
     }
 
+    private void GenerateCells<T>(T animal, ref int[ , ] arr, string tag) where T: Unit
+    {
+    	foreach (GameObject cell in GameObject.FindGameObjectsWithTag(tag))
+    	{
+    		Destroy(cell);
+    	}
+
+    	for (int i = 0; i < 5; i++)
+    	{
+    		arr[Random.Range(20, 70), Random.Range(30, 120)] = 1;
+    	}
+
+    	for (int i = 0; i < gridHeight; i++)
+    	{
+    		for (int j = 0; j < gridWidth; j++ )
+    		{
+    			if (arr[i, j] == 0) continue;
+    			Vector3 cellPosition = new Vector3(
+    				j * cellSize + cellSize/2,
+    				(cellSize * gridHeight) - (i * cellSize + cellSize/2),
+    				0
+    			);
+
+    			T clone = Instantiate(animal, cellPosition, Quaternion.identity) as T;    			
+    		}
+    	}
+    }
+
+
     private void ApplyRules()
     {
-    	//LavaDestroy();
     	EatChicken();
     	PeckMonkey();
     	KillCrocodile();
@@ -192,43 +246,17 @@ public class Instantiater : MonoBehaviour
     			{
     				nextGenGrid[i, j] = 1;
     			}
-    			// else if (livingNeighbours == 0)
-    			// {
-    			// 	nextGenGrid[i, j] = 0;
-    			// }
+    			else if (livingNeighbours == 0)
+    			{
+    				nextGenGrid[i, j] = 0;
+    			}
 
     		}
     	}
        	
-    	//arr = nextGenGrid;
     	return arr;	// GOING TO THE NEXT GEN!!! 
     }
 
-    // private void LavaDestroy()
-    // {
-    // 	for(int i = 0; i < gridHeight; i++)
-    // 	{
-    //         for(int j = 0; j < gridWidth; j++) 
-    //         {
-    //             if(lavaArray[i, j] == 1) 
-    //             {
-    //                 if(chickenArray[i, j] == 1)
-    //                 {
-    //                     chickenArray[i, j] = 0;
-    //                 }
-    //                 if(monkeyArray[i, j] == 1)
-    //                 {
-    //                     monkeyArray[i, j] = 0;
-    //                 }
-    //                 if(crocodileArray[i, j] == 1)
-    //                 {
-    //                     crocodileArray[i, j] = 0;
-    //                 }
-
-    //             }
-    //         }
-    // 	}
-    // }
 
     private void EatChicken() 
     {

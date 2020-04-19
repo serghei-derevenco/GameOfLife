@@ -4,25 +4,29 @@ using UnityEngine;
 
 public class Crocodile : Unit
 {
-    // Start is called before the first frame update
-    void Start()
+    private void OnTriggerEnter2D(Collider2D collider)
     {
-        
+    	Banana banana = collider.GetComponent<Banana>();
+
+    	if (banana)
+    	{
+    		Destroy(gameObject);
+    	}
+
+    	Lava lava = collider.GetComponent<Lava>();
+
+    	if (lava)
+    	{
+    		Destroy(gameObject);
+    	}
+
+    	Fertile fertile = collider.GetComponent<Fertile>();
+
+    	if (fertile)
+    	{
+    		int temp = Random.Range(1, 5);
+    		if (temp % 4 == 1)
+    			Instantiate(gameObject);
+    	}
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // private void OnTriggerEnter2D(Collider2D collider)
-    // {
-    // 	Lava lava = collider.GetComponent<Lava>();
-
-    // 	if (lava)
-    // 	{
-    // 		Destroy(gameObject);
-    // 	}
-    // }
 }
